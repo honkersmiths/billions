@@ -4,6 +4,7 @@
 
     uniform mat4 modelViewMatrix;
     uniform mat4 projectionMatrix;
+    uniform vec3 globalOffset;
 
     attribute vec3 position;
     attribute vec3 offset;
@@ -19,7 +20,7 @@
         vPosition = offset * max( abs( sineTime * 2.0 + 1.0 ), 0.5 ) + position;
         vec4 orientation = normalize( mix( orientationStart, orientationEnd, sineTime ) );
         vec3 vcV = cross( orientation.xyz, vPosition );
-        vPosition = vcV * ( 2.0 * orientation.w ) + ( cross( orientation.xyz, vcV ) * 2.0 + vPosition );
+        vPosition = vcV * ( 2.0 * orientation.w ) + ( cross( orientation.xyz, vcV ) * 2.0 + vPosition + globalOffset );
 
         vColor = color;
 

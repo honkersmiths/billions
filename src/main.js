@@ -4,25 +4,40 @@ import fragmentShader from './shaders/bill.frag';
 
 let container;
 let camera, scene, renderer;
+let timeOffset = 3000;
 
 init();
 
 function init() {
 
-    container = document.getElementById( 'container' );
-
-    camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10 );
-    camera.position.z = 2;
+    container = document.getElementById('container');
 
     scene = new THREE.Scene();
 
+    renderer = new THREE.WebGLRenderer();
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setAnimationLoop(animate);
+    container.appendChild(renderer.domElement);
+
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10);
+    camera.position.z = 6;
+
+    // 2008: 16M
+    initOneBillBall(scene, renderer, camera, [-2, 0, 0], 160);
+
+    // 2024: 2.6B
+    setTimeout(() =>
+            initOneBillBall(scene, renderer, camera, new THREE.Vector3(2, 0, 0), 26000),
+        timeOffset);
+}
+
+
+function initOneBillBall(scene, renderer, camera, globalOffset, billCount) {
+
     // geometry
     const vector = new THREE.Vector4();
-
-    // Let's call each bill $100,000
-    const instances = 26000;
-    // const instances = 180;
-
+    const instances = billCount;
     const offsets = [];
     const colors = [];
     const orientationsStart = [];
@@ -75,7 +90,8 @@ function init() {
 
         uniforms: {
             'time': { value: 1.0 },
-            'sineTime': { value: 1.0 }
+            'sineTime': { value: 1.0 },
+            'globalOffset': {value: globalOffset}
         },
         vertexShader: vertexShader,
         fragmentShader: fragmentShader,
@@ -87,12 +103,6 @@ function init() {
 
     const mesh = new THREE.Mesh( geometry, material );
     scene.add( mesh );
-
-    renderer = new THREE.WebGLRenderer();
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    renderer.setAnimationLoop( animate );
-    container.appendChild( renderer.domElement );
 
     window.addEventListener( 'resize', onWindowResize );
 }
@@ -108,12 +118,17 @@ function onWindowResize() {
 function animate() {
 
     const time = performance.now();
+    let which = 0;
 
-    const object = scene.children[ 0 ];
-
-    object.rotation.y = time * 0.0005;
-    object.material.uniforms[ 'time' ].value = time * 0.005;
-    object.material.uniforms[ 'sineTime' ].value = Math.sin( object.material.uniforms[ 'time' ].value * 0.05 );
+    scene.traverse((child) =>
+    {
+        // Slightly hacky traversal
+        if (child.material && child.material.uniforms) {
+            child.material.uniforms['time'].value = (time - which * timeOffset) * 0.005;
+            child.material.uniforms['sineTime'].value = Math.sin(child.material.uniforms['time'].value * 0.05);
+            which++;
+        }
+    });
 
     renderer.render( scene, camera );
 }
