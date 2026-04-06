@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import vertexShader from './shaders/bill.vert';
 import fragmentShader from './shaders/bill.frag';
+import {FontLoader, TextGeometry} from "three/addons";
 
-let container;
 let camera, scene, renderer;
 let timeOffset = 3000;
 
@@ -10,9 +10,10 @@ init();
 
 function init() {
 
-    container = document.getElementById('container');
+    let container = document.getElementById('container');
 
     scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x101020);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -30,8 +31,46 @@ function init() {
     setTimeout(() =>
             initOneBillBall(scene, renderer, camera, new THREE.Vector3(2, 0, 0), 26000),
         timeOffset);
+
+    const loader = new FontLoader();
+    let myFont;
+    loader.load('/fonts/helvetiker_bold.typeface.json', function ( font ) {
+
+        createTextGeometry(font, '2008:  $16,000,000', [-2, -2, 0]);
+        myFont = font;
+    } );
+
+    setTimeout(() => createTextGeometry(myFont, '2024:  $2,600,000,000', [2, -2, 0]), timeOffset);
 }
 
+
+function createTextGeometry(font, message, position) {
+
+    const color = 0x6090f0;
+
+    const matDark = new THREE.LineBasicMaterial({
+        color: color,
+        side: THREE.DoubleSide
+    });
+
+    const matLite = new THREE.MeshBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.8,
+        side: THREE.DoubleSide
+    });
+
+    const shapes = font.generateShapes(message, 0.1);
+    const geometry = new THREE.ShapeGeometry(shapes);
+
+    geometry.computeBoundingBox();
+    // geometry.scale(0.001, 0.001, 0.001);
+    const xMid = -0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x);
+    geometry.translate(xMid + position[0], position[1], position[2]);
+
+    const text = new THREE.Mesh(geometry, matLite);
+    scene.add(text);
+}
 
 function initOneBillBall(scene, renderer, camera, globalOffset, billCount) {
 
