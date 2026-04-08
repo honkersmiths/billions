@@ -5,6 +5,7 @@ import {FontLoader, TextGeometry} from "three/addons";
 
 let camera, scene, renderer;
 let timeOffset = 3000;
+let myFont;
 
 init();
 
@@ -24,25 +25,40 @@ function init() {
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10);
     camera.position.z = 6;
 
-    // 2008: 16M
-    initOneBillBall(scene, renderer, camera, [-2, 0, 0], 160);
-
-    // 2024: 2.6B
-    setTimeout(() =>
-            initOneBillBall(scene, renderer, camera, new THREE.Vector3(2, 0, 0), 26000),
-        timeOffset);
-
-    const loader = new FontLoader();
-    let myFont;
-    loader.load('/fonts/helvetiker_bold.typeface.json', function ( font ) {
-
-        createTextGeometry(font, '2008:  $16,000,000', [-2, -2, 0]);
-        myFont = font;
-    } );
-
-    setTimeout(() => createTextGeometry(myFont, '2024:  $2,600,000,000', [2, -2, 0]), timeOffset);
+    buildScene();
 }
 
+
+function buildScene() {
+
+    let xOff;
+    let yOff;
+
+    if (window.innerWidth > window.innerHeight) {
+        xOff = 2;
+        yOff = 0;
+    } else {
+        xOff = 0;
+        yOff = 2;
+    }
+
+    scene.clear();
+    initOneBillBall(scene, renderer, camera, [-xOff, yOff, 0], 160);
+    initOneBillBall(scene, renderer, camera, new THREE.Vector3(xOff, -yOff, 0), 26000);
+
+    const loader = new FontLoader();
+    loader.load('/fonts/helvetiker_bold.typeface.json', function ( font ) {
+
+        if (xOff > 0) {
+            createTextGeometry(font, '2008:  $16,000,000', [-2, -2, 0]);
+            createTextGeometry(font, '2024:  $2,600,000,000', [2, -2, 0]);
+        } else {
+            createTextGeometry(font, '2008:  $16,000,000', [0, 0.15, 0]);
+            createTextGeometry(font, '2024:  $2,600,000,000', [0, -0.15, 0]);
+        }
+        myFont = font;
+    } );
+}
 
 function createTextGeometry(font, message, position) {
 
@@ -147,6 +163,8 @@ function initOneBillBall(scene, renderer, camera, globalOffset, billCount) {
 }
 
 function onWindowResize() {
+
+    buildScene();
 
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
