@@ -36,11 +36,13 @@ function buildScene() {
     let yOff;
 
     if (window.innerWidth > window.innerHeight) {
+        // Landscape
         xOff = 2;
         yOff = 0;
     } else {
+        // Portrait
         xOff = 0;
-        yOff = 2;
+        yOff = 1.3;
     }
 
     scene.clear();
