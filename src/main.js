@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import vertexShader from './shaders/bill.vert';
 import fragmentShader from './shaders/bill.frag';
 import {FontLoader, TextGeometry} from "three/addons";
+import fontUrl from './assets/fonts/helvetiker_bold.typeface.json?url';
 
 let camera, scene, renderer;
 let timeOffset = 3000;
@@ -47,7 +48,7 @@ function buildScene() {
     initOneBillBall(scene, renderer, camera, new THREE.Vector3(xOff, -yOff, 0), 26000);
 
     const loader = new FontLoader();
-    loader.load('/fonts/helvetiker_bold.typeface.json', function ( font ) {
+    loader.load(fontUrl, function ( font ) {
 
         if (xOff > 0) {
             createTextGeometry(font, '2008:  $16,000,000', [-2, -2, 0]);

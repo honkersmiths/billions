@@ -1,7 +1,13 @@
 {
+  "scripts": {
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+
   "dependencies": {
     "three": "^0.183.2"
   },
+
   "devDependencies": {
     "vite": "^8.0.3",
     "vite-plugin-glsl": "^1.6.0"
