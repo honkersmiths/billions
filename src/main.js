@@ -81,7 +81,7 @@ function createTextGeometry(font, message, position) {
         side: THREE.DoubleSide
     });
 
-    const shapes = font.generateShapes(message, 100 / window.innerHeight);
+    const shapes = font.generateShapes(message, 60 / window.innerHeight);
     const geometry = new THREE.ShapeGeometry(shapes);
 
     geometry.computeBoundingBox();
