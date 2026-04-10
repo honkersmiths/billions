@@ -35,14 +35,16 @@ function buildScene() {
     let xOff;
     let yOff;
 
+    console.log("w: " + window.innerWidth + ", h: " + window.innerHeight);
+
     if (window.innerWidth > window.innerHeight) {
         // Landscape
-        xOff = 2;
+        xOff = window.innerWidth / window.innerHeight;
         yOff = 0;
     } else {
         // Portrait
         xOff = 0;
-        yOff = 1.3;
+        yOff = window.innerHeight > window.innerWidth;
     }
 
     scene.clear();
@@ -79,7 +81,7 @@ function createTextGeometry(font, message, position) {
         side: THREE.DoubleSide
     });
 
-    const shapes = font.generateShapes(message, 0.1);
+    const shapes = font.generateShapes(message, 100 / window.innerHeight);
     const geometry = new THREE.ShapeGeometry(shapes);
 
     geometry.computeBoundingBox();
